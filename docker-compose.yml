@@ -1,0 +1,29 @@
+services:
+  api:
+    image: hamravesh:v1.0.0
+    environment:
+      - REQUEST_LIMIT=1
+      - GIN_MODE=release
+      - PORT=8080
+    build: 
+     context: .
+     dockerfile: Dockerfile
+    restart: always
+    networks:
+      - back-tier
+  web:
+    image: nginx:1.23
+    restart: always
+    ports:
+      - "8080:443"
+    volumes:
+      - ./configs/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./configs/.htpasswd:/etc/nginx/.htpasswd:ro
+      - ./configs/nginx-selfsigned.crt:/etc/ssl/certs/nginx-selfsigned.crt:ro
+      - ./configs/nginx-selfsigned.key:/etc/ssl/private/nginx-selfsigned.key:ro
+    networks:
+      - back-tier
+networks:
+  back-tier: {}
+
+
